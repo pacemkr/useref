@@ -84,14 +84,14 @@ var helpers = {
         refs = lines.slice(1, -1),
         ref = '',
         indent = (lines[0].match(/^\s*/) || [])[0],
-        isWebWorker = /importScripts/.test(refs[0]);
+        isWebWorker = /^\s*importScripts\(/.test(refs[0]);
 
     target = target || 'replace';
 
     if (refs.length) {
       if (type === 'css') {
         ref = '<link rel="stylesheet" href="' + target + '"\/>';
-      } else if ( isWebWorker ) {
+      } else if (isWebWorker) {
         ref = "importScripts('" + target + "');";
       } else if (type === 'js') {
         ref = '<script src="' + target + '"></script>';
@@ -133,10 +133,11 @@ function compactContent(blocks) {
       build = String.prototype.match.apply( blocks[dest][0], [regbuild] );
 
     // parse out the list of assets to handle, and update the grunt config accordingly
-    var assets = lines.map(function (tag) {
+    var assets = lines.map(function (ref) {
 
       // The asset is the string of the referenced source file
-      var asset = (tag.match(/(href|src)=["']([^'"]+)["']/) || [])[2];
+      var matches = ref.match(/((href|src)=["']([^'"]+)["']|importScripts\(["']([^'"]+)["']\))/) || [];
+      var asset = matches[3] || matches[4];
 
       // Allow white space and comment in build blocks by checking if this line has an asset or not
       if (asset) {
