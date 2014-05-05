@@ -2,11 +2,11 @@
 'use strict';
 
 // start build pattern: <!-- build:[target] output -->
-// $1 is the type, $2 is the alternate search path, $3 is the destination file name
-var regbuild = /<!--\s*build:(\w+)(?:\(([^\)]+)\))?\s*([^\s]+)\s*-->/;
+// $2 is the type, $3 is the alternate search path, $4 is the destination file name
+var regbuild = /(<!--|\/\*)\s*build:(\w+)(?:\(([^\)]+)\))?\s*([^\s]+)\s*(-->|\*\/)/;
 
 // end build pattern -- <!-- endbuild -->
-var regend = /<!--\s*endbuild\s*-->/;
+var regend = /(<!--|\/\*)\s*endbuild\s*(-->|\*\/)/;
 
 
 module.exports = function (content) {
@@ -54,7 +54,7 @@ function getBlocks(body) {
 
     if (build) {
       block = true;
-      sections[[build[1], build[3].trim()].join(':')] = last = [];
+      sections[[build[2], build[4].trim()].join(':')] = last = [];
     }
 
     // switch back block flag when endbuild
@@ -151,9 +151,9 @@ function compactContent(blocks) {
 
     result[type] = result[type] || {};
     result[type][output] = { 'assets': assets };
-    if (build[2]) {
+    if (build[3]) {
       // Alternate search path
-      result[type][output].searchPaths = build[2];
+      result[type][output].searchPaths = build[3];
     }
   });
 
