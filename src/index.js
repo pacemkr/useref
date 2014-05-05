@@ -83,13 +83,16 @@ var helpers = {
         lines = block.split(linefeed),
         refs = lines.slice(1, -1),
         ref = '',
-        indent = (lines[0].match(/^\s*/) || [])[0];
+        indent = (lines[0].match(/^\s*/) || [])[0],
+        isWebWorker = /importScripts/.test(refs[0]);
 
     target = target || 'replace';
 
     if (refs.length) {
       if (type === 'css') {
         ref = '<link rel="stylesheet" href="' + target + '"\/>';
+      } else if ( isWebWorker ) {
+        ref = "importScripts('" + target + "');";
       } else if (type === 'js') {
         ref = '<script src="' + target + '"></script>';
       }
